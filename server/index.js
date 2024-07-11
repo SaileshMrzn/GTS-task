@@ -34,9 +34,7 @@ const createPackage = (selectedItems) => {
 
     //check if the price limit exceeds
     if (currentPackage.totalPrice + itemDetails.price > 250) {
-      console.log("error");
-
-      console.log(finalPackage);
+      console.log("price limit exceed");
     }
 
     currentPackage.items.push(itemDetails.name);
@@ -49,17 +47,19 @@ const createPackage = (selectedItems) => {
     courierPrice: calculateCourierCharge(currentPackage.totalWeight),
   });
 
-  // for (let pkg of finalPackage) {
-  //   calculateCourierCharge(pkg.totalWeight);
-  // }
-
   return finalPackage;
 };
 
 app.post("/place-order", (req, res) => {
-  const { selectedItems } = req.body;
-  const order = createPackage(selectedItems);
-  res.json(order);
+  try {
+    const { selectedItems } = req.body;
+    const order = createPackage(selectedItems);
+    res
+      .status(201)
+      .json({ message: "Order placed successfully", order: order });
+  } catch (error) {
+    res.status(500).json({ error: "Filed to place order" });
+  }
 });
 
 app.listen(port, () => {
